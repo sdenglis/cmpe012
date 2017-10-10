@@ -14,4 +14,15 @@ a.out
 
 # Editor ignores
 *.bak
+*.swp
 *~
+
+# Other
+*.exe
+*.tgz
+*.tar
+*.zip
+*.pkg
+*.dmg
+*.img
+*.iso
