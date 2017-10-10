@@ -21,7 +21,6 @@ a.out
 *.exe
 *.tgz
 *.tar
-*.zip
 *.pkg
 *.dmg
 *.img
