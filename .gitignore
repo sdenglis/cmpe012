@@ -15,6 +15,7 @@ a.out
 # Editor ignores
 *.bak
 *.swp
+*.swo
 *~
 
 # Other
