@@ -11,6 +11,8 @@
 # C ignores
 a.out
 *.o
+*.a
+*.so
 
 # Editor ignores
 *.bak
