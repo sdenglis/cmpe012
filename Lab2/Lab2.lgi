@@ -677,10 +677,12 @@ mag1
 7 309 428 358 379 0 1
 7 713 440 762 391 0 1
 7 717 242 766 193 0 1
-22 16 560 214 540 0 \NUL
+22 14 537 212 517 0 \NUL
 MSB (reg3) acts as select line
-22 16 585 321 565 0 \NUL
+22 14 562 319 542 0 \NUL
 each reg output is converted into mag variable
+22 14 586 305 566 0 \NUL
+inverts bits when needed for 2sc conversion
 1 652 176 614 161
 1 609 228 652 204
 1 554 175 569 175
