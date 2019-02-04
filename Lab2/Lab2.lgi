@@ -84,8 +84,8 @@ Sign
 Magnitude
 22 486 564 790 544 0 \NUL
 Do not modify this page other than your name,
-22 510 288 710 268 0 \NUL
-Extra Credit Implemented: Y/N
+22 510 288 696 268 0 \NUL
+Extra Credit Implemented: N
 22 486 588 770 568 0 \NUL
 CruzID, and Y or N in Extra Credit comment
 1 148 185 157 176
@@ -334,6 +334,12 @@ Simplified MUX into simple XOR gate
 +1
 22 31 251 47 231 0 \NUL
 -1
+22 16 540 302 520 0 \NUL
+I've realized E.C can be implemented using
+22 16 559 362 539 0 \NUL
+saturation arithmetic, but that is currently beyond me
+22 16 578 248 558 0 \NUL
+someone please go over it in class
 1 467 206 345 206
 1 466 263 441 263
 1 467 241 441 263
@@ -383,7 +389,6 @@ Output from temp reg (reg var)
 Sum feedback for reg input (D var)
 22 284 203 343 183 0 \NUL
 no cin_0
-14 288 231 337 182
 20 559 234 618 215 0
 c_out0
 7 556 165 605 116 0 1
@@ -392,6 +397,7 @@ c_out0
 7 557 324 606 275 0 1
 22 631 236 764 216 0 \NUL
 carry out (c_out var)
+14 288 231 337 182
 1 400 156 361 156
 1 466 210 445 210
 1 466 238 445 253
@@ -413,13 +419,13 @@ carry out (c_out var)
 1 316 170 170 267
 1 316 142 226 142
 1 400 239 226 142
-1 334 206 400 184
-1 334 206 400 196
 1 560 224 511 224
 1 462 327 558 299
 1 558 411 528 381
 1 557 140 445 170
 1 511 224 558 253
+1 334 206 400 184
+1 334 206 400 196
 38 5
 22 36 36 76 16 0 \NUL
 Lab 2
@@ -455,14 +461,16 @@ D3
 D2
 19 114 310 173 291 0
 reg3
-7 541 407 590 358 0 1
-22 502 440 686 420 0 \NUL
-we ignore the final carry out
 7 537 160 586 111 0 1
 7 540 273 589 224 0 1
 7 541 321 590 272 0 1
 22 674 594 792 574 0 \NUL
 4-bit Adder CONT.
+20 562 392 621 373 0
+extra
+19 564 426 623 407 0
+extra
+7 638 441 687 392 0 1
 1 399 150 360 150
 1 315 136 225 136
 1 399 233 225 136
@@ -486,10 +494,11 @@ we ignore the final carry out
 1 444 164 542 164
 1 341 300 170 300
 1 425 397 170 300
-1 542 382 536 382
 1 538 135 444 164
 1 542 296 470 328
 1 541 248 510 218
+1 563 382 536 382
+1 620 416 639 416
 38 6
 22 36 36 76 16 0 \NUL
 Lab 2
