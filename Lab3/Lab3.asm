@@ -16,12 +16,37 @@
 
 .data # Initiates and stores variables / int's in RAM.
 
-
-      # Enter the length of one of the triangle legs: _
-      # Enter the number of triangles to print: _
+     prompt: .asciiz "Enter the length of one of the trangle legs: "
+     prompt_2: .asciiz "Enter the number of triangles to print: "
 
 
 .text # Calls variables during stack in form of functions and arguments.
 
+      #Prompt to enter 
+      li $v0, 4
+      la $a0, prompt
+      syscall
+
+      #Collect response for number of sides
+      li $v0, 5
+      syscall
+      
+      #Store resulting data value in $t0
+      move $t0, $v0
+      
+      #Prompt_2 to enter 
+      li $v0, 4
+      la $a0, prompt_2
+      syscall
+
+      #Collect response for number triangles
+      li $v0, 5
+      syscall
+      
+      #Store resulting data value in $t1
+      move $t1, $v0
+
 
       # Print combination of inputs and character variables based on user feedback
+
+
