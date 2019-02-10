@@ -22,24 +22,24 @@
 
 .text # Calls variables during stack in form of functions and arguments.
 
-      #Prompt to enter 
+      #Prompt user to enter 
       li $v0, 4
       la $a0, prompt
       syscall
 
-      #Collect response for number of sides
+      #Collect response for (number of sides)
       li $v0, 5
       syscall
       
       #Store resulting data value in $t0
       move $t0, $v0
       
-      #Prompt_2 to enter 
+      #Prompt_2 user to enter 
       li $v0, 4
       la $a0, prompt_2
       syscall
 
-      #Collect response for number triangles
+      #Collect response for (number triangles)
       li $v0, 5
       syscall
       
