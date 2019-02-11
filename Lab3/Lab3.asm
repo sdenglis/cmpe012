@@ -61,8 +61,10 @@
      	jal printLine
      	
      main:
-     	
+     	# Simple sentinel loop statement for number of triangles
      	bge $t4, $t1, exitMain
+     	
+     	
      	
      	# Sets $t2 = 0 (i) for condition statement usage
      	addi $t2, $zero, 0
@@ -75,7 +77,7 @@
      		bge $t2, $t0, exit_1
      		
 ##########################################################################
-# Inner loop
+# Inner loop (going upwards)
 		# Calibrate $t3 to 0 for all inner loop cycles
 		li $t3, 0
 		
@@ -89,7 +91,7 @@
      		j whileInner_1
      		
 ##########################################################################
-# Outer loop
+# Outer loop (goin upwards)
 
 	exitInner_1:
      		jal printBCK
@@ -113,7 +115,7 @@
      		bge $t2, $t0, exit_2
      		
 ##########################################################################
-# Inner loop_2
+# Inner loop (going downwards)
 		# Calibrate $t3 to 0 for all inner loop cycles
 		addi $t3, $t0, -1
 		
@@ -127,7 +129,7 @@
      		j whileInner_2
      		
 ##########################################################################
-# Outer loop_2
+# Outer loop (going downwards)
 
 	exitInner_2:
      		jal printFWD
