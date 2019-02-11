@@ -72,89 +72,95 @@
      	# Sets $t3 = 0 (j) for condition statement usage
      	addi $t3, $zero, 0
      	
-     	while_1:
-		# Checks for i < number of sides (user input), branches to exit if false
-     		bge $t2, $t0, exit_1
+     while_1:
+	# Checks for i < number of sides (user input), branches to exit if false
+     	bge $t2, $t0, exit_1
      		
 ##########################################################################
 # Inner loop (going upwards)
-		# Calibrate $t3 to 0 for all inner loop cycles
-		li $t3, 0
+
+	# Calibrate $t3 to 0 for all inner loop cycles
+	li $t3, 0
 		
-	whileInner_1:
-		# Checks for j < i, branches to continue outer loop if false
-     		bge $t3, $t2, exitInner_1
-     		jal printSpace
-     		# Increments $t3 (j) by a value of 1 (j++)
-     		addi $t3, $t3, 1
+     whileInner_1:
+	# Checks for j < i, branches to continue outer loop if false
+     	bge $t3, $t2, exitInner_1
+     	jal printSpace
+     	# Increments $t3 (j) by a value of 1 (j++)
+     	addi $t3, $t3, 1
      		
-     		j whileInner_1
+     	j whileInner_1
      		
 ##########################################################################
-# Outer loop (goin upwards)
+# Outer loop (going upwards)
 
-	exitInner_1:
-     		jal printBCK
-     		jal printLine
+     exitInner_1:
+     	jal printBCK
+     	jal printLine
      	
-     		# Increments $t2 (i) by a value of 1 (i++)
-     		addi $t2, $t2, 1
+     	# Increments $t2 (i) by a value of 1 (i++)
+     	addi $t2, $t2, 1
      	
-     		j while_1
+     	j while_1
      	
-     	exit_1:
+     exit_1:
      	
-     		# Sets $t2 = 0 (i) for condition statement usage
+     	# Sets $t2 = 0 (i) for condition statement usage
      	addi $t2, $zero, 0
      	
      	# Sets $t3 = 0 (j) for condition statement usage
      	addi $t3, $zero, 0
      	
-     	while_2:
-		# Checks for i < number of sides (user input), branches to exit if false
-     		bge $t2, $t0, exit_2
+     while_2:
+	# Checks for i < number of sides (user input), branches to exit if false
+     	bge $t2, $t0, exit_2
      		
 ##########################################################################
 # Inner loop (going downwards)
-		# Calibrate $t3 to 0 for all inner loop cycles
-		addi $t3, $t0, -1
+
+	# Calibrate $t3 to 0 for all inner loop cycles
+	addi $t3, $t0, -1
 		
-	whileInner_2:
-		# Checks for j > i, branches to continue outer loop if false
-     		ble $t3, $t2, exitInner_2
-     		jal printSpace
-     		# Increments $t3 (j) by a value of 1 (j--)
-     		addi $t3, $t3, -1
+     whileInner_2:
+	# Checks for j > i, branches to continue outer loop if false
+     	ble $t3, $t2, exitInner_2
+     	jal printSpace
+     	# Increments $t3 (j) by a value of 1 (j--)
+     	addi $t3, $t3, -1
      		
-     		j whileInner_2
+     	j whileInner_2
      		
 ##########################################################################
 # Outer loop (going downwards)
 
-	exitInner_2:
-     		jal printFWD
+     exitInner_2:
+     	jal printFWD
      		
-     		beq $t4, $t1, endProgram
-     		jal printLine
+     	beq $t4, $t1, endProgram
+     	jal printLine
      	
-     		# Increments $t2 (i) by a value of 1 (i++)
-     		addi $t2, $t2, 1
+     	# Increments $t2 (i) by a value of 1 (i++)
+     	addi $t2, $t2, 1
      	
-     		j while_2
+     	j while_2
      	
-     	exit_2:
+     exit_2:
      	
      	# Increment n (number of triangles loop) by a value of 1 (n++)
      	addi $t4, $t4, 1
      	
      	j main
      
-     	exitMain:
-	endProgram:
+     
+     
+     exitMain:
+     endProgram:
 
      	# Tells the system that the program is complete.
      	li $v0, 10
      	syscall
+
+
 
 ##########################################################################
 # Functions / stored procedures for main input
