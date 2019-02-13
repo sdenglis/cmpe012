@@ -17,7 +17,8 @@
 # $t2: i condition (arbitrary)
 # $t3: j condition (arbitrary)
 # $t4: n condition (number of triangles)
-
+# $t5: BEQ Condition to check against $t3 for final main iteration
+# $t6: Value to compare to $t2
 
 
 .data   # Initiates and stores variables / int's in RAM.
@@ -65,12 +66,19 @@
      	bge $t4, $t1, exitMain
      	
      	
-     	
+     # Initialization of Variables:
+     
      	# Sets $t2 = 0 (i) for condition statement usage
      	addi $t2, $zero, 0
      	
      	# Sets $t3 = 0 (j) for condition statement usage
      	addi $t3, $zero, 0
+     	
+     	# Initialize $t5 for BEQ condition usage
+     	addi $t5, $t1, -1
+     	
+     	# Initialize $t6 for && BEQ comparison
+     	addi $t6, $t0, -1
      	
      while_1:
 	# Checks for i < number of sides (user input), branches to exit if false
@@ -104,7 +112,6 @@
      	j while_1
      	
      exit_1:
-     	
      	# Sets $t2 = 0 (i) for condition statement usage
      	addi $t2, $zero, 0
      	
@@ -135,8 +142,18 @@
 
      exitInner_2:
      	jal printFWD
-     		
-     	beq $t4, $t1, endProgram
+     	
+     	# Check for most recent increment for last loop iteration, allowing program to branch directly to syscall for immediate termination.	
+     	beq $t4, $t5, ELSE
+     	# && condition, only arrives at endProgram state when both conditions are satisfied.
+	j L1
+     ELSE: 
+     	beq $t3, $t6, ELSE2
+     	j L1
+     ELSE2:
+     	j endProgram
+     	
+     L1:
      	jal printLine
      	
      	# Increments $t2 (i) by a value of 1 (i++)
@@ -145,7 +162,6 @@
      	j while_2
      	
      exit_2:
-     	
      	# Increment n (number of triangles loop) by a value of 1 (n++)
      	addi $t4, $t4, 1
      	
