@@ -11,6 +11,7 @@
 #
 # Notes: This program is intended to be run from the MARS IDE.
 ##########################################################################
+
 # REGISTER USAGE
 # $t0: user input (number of sides)
 # $t1: user input (number of triangles)
@@ -18,11 +19,12 @@
 # $t3: j condition (arbitrary)
 # $t4: n condition (number of triangles)
 # $t5: BEQ Condition to check against $t3 for final main iteration
-# $t6: Value to compare to $t2
+# $t6: value to compare to $t2
+# $ra: used to tidy up code and reference procedures remotely within each loop.
+
 
 
 .data   # Initiates and stores variables / int's in RAM.
-
 	prompt:    .asciiz "Enter the length of one of the triangle legs: "
 	prompt_2:  .asciiz "Enter the number of triangles to print: "
      
@@ -32,71 +34,51 @@
 	charBCK:   .asciiz "\\\000"   # Back-slash character
 
 
+
 .text   # Calls variables during stack in form of functions and arguments.
      input:
-	# Prompt user to enter 
-	li $v0, 4
+	li $v0, 4       	      # Prompt user to enter 
 	la $a0, prompt
 	syscall
 
-	# Collect response for (number of sides)
-	li $v0, 5
+	li $v0, 5                     # Collect response for (number of sides)
 	syscall
       
-	# Store resulting data value in $t0
-	move $t0, $v0
+	move $t0, $v0                 # Store resulting data value in $t0
       
-	# Prompt_2 user to enter 
-	li $v0, 4
+	li $v0, 4                     # Prompt_2 user to enter 
 	la $a0, prompt_2
 	syscall
 
-	# Collect response for (number triangles)
-	li $v0, 5
+	li $v0, 5                     # Collect response for (number triangles)
 	syscall
       
-	# Store resulting data value in $t1
-	move $t1, $v0
+	move $t1, $v0                 # Store resulting data value in $t1
 	
-	# Print extra line to conform with formatting
-     	jal printLine
+     	jal printLine         	      # Print extra line to conform with formatting
      	
      main:
-     	# Simple sentinel loop statement for number of triangles
-     	bge $t4, $t1, exitMain
-     	
+     	bge $t4, $t1, exitMain        # Simple sentinel loop statement for number of triangles
      	
      # Initialization of Variables:
      
-     	# Sets $t2 = 0 (i) for condition statement usage
-     	addi $t2, $zero, 0
-     	
-     	# Sets $t3 = 0 (j) for condition statement usage
-     	addi $t3, $zero, 0
-     	
-     	# Initialize $t5 for BEQ condition usage
-     	addi $t5, $t1, -1
-     	
-     	# Initialize $t6 for && BEQ comparison
-     	addi $t6, $t0, -1
+     	addi $t2, $zero, 0            # Sets $t2 = 0 (i) for condition statement usage
+     	addi $t3, $zero, 0            # Sets $t3 = 0 (j) for condition statement usage
+     	addi $t5, $t1, -1             # Initialize $t5 for BEQ condition usage
+     	addi $t6, $t0, -1             # Initialize $t6 for && BEQ comparison
      	
      while_1:
-	# Checks for i < number of sides (user input), branches to exit if false
-     	bge $t2, $t0, exit_1
+     	bge $t2, $t0, exit_1 	      # Checks for i < number of sides (user input), branches to exit if false
      		
 ##########################################################################
 # Inner loop (going upwards)
 
-	# Calibrate $t3 to 0 for all inner loop cycles
-	li $t3, 0
+	li $t3, 0                     # Calibrate $t3 to 0 for all inner loop cycles
 		
      whileInner_1:
-	# Checks for j < i, branches to continue outer loop if false
-     	bge $t3, $t2, exitInner_1
+     	bge $t3, $t2, exitInner_1     # Checks for j < i, branches to continue outer loop if false
      	jal printSpace
-     	# Increments $t3 (j) by a value of 1 (j++)
-     	addi $t3, $t3, 1
-     		
+     	addi $t3, $t3, 1              # Increments $t3 (j) by a value of 1 (j++)	
      	j whileInner_1
      		
 ##########################################################################
@@ -104,37 +86,26 @@
 
      exitInner_1:
      	jal printBCK
-     	jal printLine
-     	
-     	# Increments $t2 (i) by a value of 1 (i++)
-     	addi $t2, $t2, 1
-     	
+     	jal printLine	
+     	addi $t2, $t2, 1  	      # Increments $t2 (i) by a value of 1 (i++)
      	j while_1
      	
      exit_1:
-     	# Sets $t2 = 0 (i) for condition statement usage
-     	addi $t2, $zero, 0
-     	
-     	# Sets $t3 = 0 (j) for condition statement usage
-     	addi $t3, $zero, 0
+     	addi $t2, $zero, 0            # Sets $t2 = 0 (i) for condition statement usage
+     	addi $t3, $zero, 0 	      # Sets $t3 = 0 (j) for condition statement usage
      	
      while_2:
-	# Checks for i < number of sides (user input), branches to exit if false
-     	bge $t2, $t0, exit_2
+     	bge $t2, $t0, exit_2          # Checks for i < number of sides (user input), branches to exit if false
      		
 ##########################################################################
 # Inner loop (going downwards)
 
-	# Calibrate $t3 to 0 for all inner loop cycles
-	addi $t3, $t0, -1
+	addi $t3, $t0, -1             # Calibrate $t3 to 0 for all inner loop cycles
 		
      whileInner_2:
-	# Checks for j > i, branches to continue outer loop if false
-     	ble $t3, $t2, exitInner_2
+     	ble $t3, $t2, exitInner_2     # Checks for j > i, branches to continue outer loop if false
      	jal printSpace
-     	# Increments $t3 (j) by a value of 1 (j--)
-     	addi $t3, $t3, -1
-     		
+     	addi $t3, $t3, -1             # Increments $t3 (j) by a value of 1 (j--)
      	j whileInner_2
      		
 ##########################################################################
@@ -143,12 +114,10 @@
      exitInner_2:
      	jal printFWD
      	
-     	# Check for most recent increment for last loop iteration, allowing program to branch directly to syscall for immediate termination.	
-     	beq $t4, $t5, ELSE
-     	# && condition, only arrives at endProgram state when both conditions are satisfied.
+     	beq $t4, $t5, ELSE            # Check for most recent increment for last loop iteration, allowing program to branch directly to syscall for immediate termination.	
 	j L1
      ELSE: 
-     	beq $t3, $t6, ELSE2
+     	beq $t3, $t6, ELSE2           # && condition, only arrives at endProgram state when both conditions are satisfied.
      	j L1
      ELSE2:
      	j endProgram
@@ -156,15 +125,11 @@
      L1:
      	jal printLine
      	
-     	# Increments $t2 (i) by a value of 1 (i++)
-     	addi $t2, $t2, 1
-     	
+     	addi $t2, $t2, 1 	      # Increments $t2 (i) by a value of 1 (i++)
      	j while_2
      	
      exit_2:
-     	# Increment n (number of triangles loop) by a value of 1 (n++)
-     	addi $t4, $t4, 1
-     	
+     	addi $t4, $t4, 1              # Increment n (number of triangles loop) by a value of 1 (n++)
      	j main
      
      
@@ -172,8 +137,7 @@
      exitMain:
      endProgram:
 
-     	# Tells the system that the program is complete.
-     	li $v0, 10
+     	li $v0, 10 	              # Tells the system that the program is complete.
      	syscall
 
 
@@ -181,25 +145,25 @@
 ##########################################################################
 # Functions / stored procedures for main input
 
-      	printLine:       # Prints a new line
+      	printLine:                    # Prints a new line
 	li $v0, 4
 	la $a0, newLine
 	syscall
 	jr $ra
 	
-	printSpace:      # Prints a space
+	printSpace:                   # Prints a space
 	li $v0, 4
 	la $a0, charSpace
 	syscall
 	jr $ra
 	
-	printFWD:        # Prints a forward-slash
+	printFWD:                     # Prints a forward-slash
 	li $v0, 4
 	la $a0, charFWD
 	syscall
 	jr $ra
 	
-	printBCK:        # Prints a back-slash
+	printBCK:                     # Prints a back-slash
 	li $v0, 4
 	la $a0, charBCK
 	syscall
