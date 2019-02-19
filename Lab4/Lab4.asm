@@ -18,6 +18,15 @@
 # $v0: Syscall Register.
 # $a0: Arguments register.
 
+# PSEUDO CODE
+# Obtain user input for first string of ASCII characters.
+# Obtain user input for second string of ASCII characters.
+# Print input feedback with prompt.
+# Convert each string into 32-bit two's compliment numbers.
+# Perform addition operation and store sum into $s0.
+# Convert resultant value and manipulate into a base(4) signed integer.
+# Print final signed magnitude to display with no leading 0's.
+
 .data
 	feedback:    .asciiz "You entered the numbers:\n"
 	# Maximum size of input is 8 bits for binary value + 2-bit 0b preface.
