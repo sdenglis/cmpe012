@@ -1,7 +1,7 @@
 ##########################################################################
 # Created by:  English, Samuel
 #              sdenglis
-#              7 August 2018
+#              18 February 2019
 # Assignment:  Lab 4: ASCII conversion
 #              CMPE 012, Computer Systems and Assembly Language
 #              UC Santa Cruz, Winter 2019
@@ -19,6 +19,77 @@
 # $a0: Arguments register.
 
 .data
-
+	feedback:    .asciiz "You entered the numbers:\n"
+	# Maximum size of input is 8 bits for binary value + 2-bit 0b preface.
+	userInput_1: .space 10
+	userInput_2: .space 10
+	# New line character
+	newLine:     .asciiz "\n"
+	space:       .asciiz " "
 .text
+	main:
+	# Obtain user input in form of text (1).
+	li $v0, 8
+	la $a0, userInput_1
+	# Maximum allowed input size.
+	li $a1, 10
+	syscall
+	
+	# Prints a new line.
+	li $v0, 4
+	la $a0, newLine
+	syscall
 
+	# Obtain user input in form of text (2).
+	li $v0, 8
+	la $a0, userInput_2
+	# Maximum allowed input size.
+	li $a1, 10
+	syscall
+	
+	# Prints a new line.
+	li $v0, 4
+	la $a0, newLine
+	syscall
+	
+	# Displays feedback prompt.
+	li $v0, 4
+	la $a0, feedback
+	syscall
+	
+	# Displays userInput_1.
+	li $v0, 4
+	la $a0, userInput_1
+	syscall
+	
+	# Prints a space character.
+	li $v0, 4
+	la $a0, space
+	syscall
+	
+	# Displays userInput_2.
+	li $v0, 4
+	la $a0, userInput_2
+	syscall
+	
+	# Tell the program to terminate main command.
+	li $v0, 10
+	syscall
+	
+	
+##########################################################################
+# PROCEDURE LABELS
+
+	# Prints a new line character.
+	printLine:
+	li $v0, 4
+	la $a0, newLine
+	syscall
+	jr $ra
+	
+	# Prints a space character.
+	printSpace:
+	li $v0, 4
+	la $a0, space
+	syscall
+	jr $ra
