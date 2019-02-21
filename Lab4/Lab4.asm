@@ -23,8 +23,16 @@
 # Obtain user input for second string of ASCII characters.
 # Print input feedback with prompt.
 # Convert each string into 32-bit two's compliment numbers.
+######### Convert ASCII hex -> hex -> binary -> signed integer.
+################# Subtract ASCII conversion value.
+################# Use division and modulo values to convert hex into binary.
+################# Use running sums to convert binary into signed integer.
+######### Convert ASCII binary -> binary -> signed integer.
+################# Subtract ASCII conversion value.
+################# Use running sums to convert binary into signed integer.
 # Perform addition operation and store sum into $s0.
 # Convert resultant value and manipulate into a base(4) signed integer.
+######### Convert signed integer -> base(4)
 # Print final signed magnitude to display with no leading 0's.
 
 .data
@@ -38,28 +46,28 @@
 .text
 	main:
 	# Obtain user input in form of text (1).
-	li $v0, 8
-	la $a0, userInput_1
+#	li $v0, 8
+#	la $a0, userInput_1
 	# Maximum allowed input size.
-	li $a1, 10
-	syscall
+#	li $a1, 10
+#	syscall
 	
 	# Prints a new line.
-	li $v0, 4
-	la $a0, newLine
-	syscall
+#	li $v0, 4
+#	la $a0, newLine
+#	syscall
 
 	# Obtain user input in form of text (2).
-	li $v0, 8
-	la $a0, userInput_2
+#	li $v0, 8
+#	la $a0, userInput_2
 	# Maximum allowed input size.
-	li $a1, 10
-	syscall
+#	li $a1, 10
+#	syscall
 	
 	# Prints a new line.
-	li $v0, 4
-	la $a0, newLine
-	syscall
+#	li $v0, 4
+#	la $a0, newLine
+#	syscall
 	
 	# Displays feedback prompt.
 	li $v0, 4
