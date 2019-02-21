@@ -74,10 +74,16 @@
 	la $a0, feedback
 	syscall
 	
-	# Displays userInput_1.
+	# Print user input???
+	lw $a0, 4($a1)
 	li $v0, 4
-	la $a0, userInput_1
+	lw $t0, 4($a1)
 	syscall
+	
+	# Displays userInput_1.
+#	li $v0, 4
+#	la $a0, userInput_1
+#	syscall
 	
 	# Prints a space character.
 	li $v0, 4
@@ -85,8 +91,14 @@
 	syscall
 	
 	# Displays userInput_2.
+#	li $v0, 4
+#	la $a0, userInput_2
+#	syscall
+
+	# Print second user input?
+	lw $a0, 0($a1)
 	li $v0, 4
-	la $a0, userInput_2
+	lw $t1, 0($a1)
 	syscall
 	
 	# Tell the program to terminate main command.
