@@ -23,52 +23,27 @@
 # Obtain user input for second string of ASCII characters.
 # Print input feedback with prompt.
 # Convert each string into 32-bit two's compliment numbers.
-######### Convert ASCII hex -> hex -> binary -> signed integer.
-################# Subtract ASCII conversion value.
-################# Use division and modulo values to convert hex into binary.
-################# Use running sums to convert binary into signed integer.
-######### Convert ASCII binary -> binary -> signed integer.
-################# Subtract ASCII conversion value.
-################# Use running sums to convert binary into signed integer.
+# Convert ASCII hex -> hex -> binary -> signed integer.
+# Subtract ASCII conversion value.
+# Use division and modulo values to convert hex into binary.
+# Use running sums to convert binary into signed integer.
+# Convert ASCII binary -> binary -> signed integer.
+# Subtract ASCII conversion value.
+# Use running sums to convert binary into signed integer.
 # Perform addition operation and store sum into $s0.
 # Convert resultant value and manipulate into a base(4) signed integer.
-######### Convert signed integer -> base(4)
+# Convert signed integer -> base(4)
 # Print final signed magnitude to display with no leading 0's.
 
-.data
-	feedback:    .asciiz "You entered the numbers:\n"
+.data	
 	# Maximum size of input is 8 bits for binary value + 2-bit 0b preface.
-	userInput_1: .space 10
-	userInput_2: .space 10
+	feedback:    .asciiz "You entered the numbers:\n"
+
 	# New line character
 	newLine:     .asciiz "\n"
 	space:       .asciiz " "
 .text
 	main:
-	# Obtain user input in form of text (1).
-#	li $v0, 8
-#	la $a0, userInput_1
-	# Maximum allowed input size.
-#	li $a1, 10
-#	syscall
-	
-	# Prints a new line.
-#	li $v0, 4
-#	la $a0, newLine
-#	syscall
-
-	# Obtain user input in form of text (2).
-#	li $v0, 8
-#	la $a0, userInput_2
-	# Maximum allowed input size.
-#	li $a1, 10
-#	syscall
-	
-	# Prints a new line.
-#	li $v0, 4
-#	la $a0, newLine
-#	syscall
-	
 	# Displays feedback prompt.
 	li $v0, 4
 	la $a0, feedback
@@ -77,29 +52,30 @@
 	# Print user input???
 	lw $a0, 4($a1)
 	li $v0, 4
+	
 	lw $t0, 4($a1)
 	syscall
-	
-	# Displays userInput_1.
-#	li $v0, 4
-#	la $a0, userInput_1
-#	syscall
-	
+
 	# Prints a space character.
 	li $v0, 4
 	la $a0, space
 	syscall
 	
-	# Displays userInput_2.
-#	li $v0, 4
-#	la $a0, userInput_2
-#	syscall
-
 	# Print second user input?
 	lw $a0, 0($a1)
 	li $v0, 4
+	
 	lw $t1, 0($a1)
 	syscall
+	
+	string_sorter:
+	# If first letter == 0
+		# If second letter == h
+			# Hex
+		# Else binary
+	# Else decimal
+	
+	
 	
 	# Tell the program to terminate main command.
 	li $v0, 10
