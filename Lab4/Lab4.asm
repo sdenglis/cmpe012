@@ -43,17 +43,17 @@
 	newLine:     .asciiz "\n"
 	space:       .asciiz " "
 .text
-	main:
+   main:
 	# Displays feedback prompt.
 	li $v0, 4
 	la $a0, feedback
 	syscall
 	
-	# Print user input???
+	# Print user input.
 	lw $a0, 4($a1)
 	li $v0, 4
 	
-	lw $t0, 4($a1)
+	lw $s1, 4($a1)
 	syscall
 
 	# Prints a space character.
@@ -61,22 +61,39 @@
 	la $a0, space
 	syscall
 	
-	# Print second user input?
+	# Print second user input.
 	lw $a0, 0($a1)
 	li $v0, 4
 	
-	lw $t1, 0($a1)
+	lw $s2, 0($a1)
 	syscall
 	
-	string_sorter:
-	# If first letter == 0
-		# If second letter == h
-			# Hex
-		# Else binary
-	# Else decimal
+   string_sorter:
+
+	li $t9, 0x00000078    # Store condition for hexadecimal check (x).
+	li $t8, 0x00000062    # Store condition for binary check (b).
+	li $t7, 0x00000030    # Stores condition for decimal check (=/= 0).
+	
+	lb $t1, 0x01($s1)     # Stores the second byte of $s1 into $t1.
+	lb $t2, 0x01($s2)     # Stores the second byte of $s2 into $t2.
+	lb $t3, 0x00($s1)     # Stores the first byte of $s1 into $t3.
+	lb $t4, 0x00($s2)     # Stores the first byte of $s2 into $t4.
 	
 	
 	
+	bne $t3, $t7, dec_condition # Check if $s1 =/= decimal
+	bne $t4, $t7, dec_condition # Check if $s2 =/= decimal
+	
+   dec_condition:
+	beq $t1, $t9, hex_condition # Check if x($s1) = x
+	beq $t2, $t9, hex_condition # Check if x($s2) = x
+	
+   hex_condition:
+	beq $t1, $t8, bin_condition # Check if b($s1) = b
+	beq $t2, $t8, bin_condition # Check if b($s2) = b
+	
+   bin_condition:
+   
 	# Tell the program to terminate main command.
 	li $v0, 10
 	syscall
