@@ -80,20 +80,31 @@
 	lb $t4, 0x00($s2)     # Stores the first byte of $s2 into $t4.
 	
 	
-	
-	bne $t3, $t7, dec_condition # Check if $s1 =/= decimal
-	bne $t4, $t7, dec_condition # Check if $s2 =/= decimal
-	
    dec_condition:
-	beq $t1, $t9, hex_condition # Check if x($s1) = x
-	beq $t2, $t9, hex_condition # Check if x($s2) = x
+	bne $t3, $t7, dec_convert # Check if $s1 =/= decimal
+	bne $t4, $t7, dec_convert # Check if $s2 =/= decimal
 	
+   dec_convert:
+   	# Subtract ASCII code value, leave as signed decimal
+   	
    hex_condition:
-	beq $t1, $t8, bin_condition # Check if b($s1) = b
-	beq $t2, $t8, bin_condition # Check if b($s2) = b
+	beq $t1, $t9, hex_convert # Check if x($s1) = x
+	beq $t2, $t9, hex_convert # Check if x($s2) = x
 	
+   hex_convert:
+   	# Subtract ASCII value
+   	# Convert to binary
+   	# Convert to signed decimal
+   	
    bin_condition:
+	beq $t1, $t8, bin_convert # Check if b($s1) = b
+	beq $t2, $t8, bin_convert # Check if b($s2) = b
+	
+   bin_convert:
+   	# Subtract ASCII value
+   	# Convert to signed decimal
    
+   endProgram:
 	# Tell the program to terminate main command.
 	li $v0, 10
 	syscall
