@@ -42,8 +42,10 @@
 	# New line character
 	newLine:     .asciiz "\n"
 	space:       .asciiz " "
+	
+	testArray:   .space 1
 .text
-   main:
+   main: nop
 	# Displays feedback prompt.
 	li $v0, 4
 	la $a0, feedback
@@ -68,11 +70,11 @@
 	lw $s2, 0($a1)
 	syscall
 	
-   string_sorter:
+   stringSorter: nop
 
-	li $t9, 0x00000078    # Store condition for hexadecimal check (x).
-	li $t8, 0x00000062    # Store condition for binary check (b).
-	li $t7, 0x00000030    # Stores condition for decimal check (=/= 0).
+	#li $t9, 0x00000078    # Store condition for hexadecimal check (x).
+	#li $t8, 0x00000062    # Store condition for binary check (b).
+	#li $t7, 0x00000030    # Stores condition for decimal check (=/= 0).
 	
 	lb $t1, 0x01($s1)     # Stores the second byte of $s1 into $t1.
 	lb $t2, 0x01($s2)     # Stores the second byte of $s2 into $t2.
@@ -80,31 +82,76 @@
 	lb $t4, 0x00($s2)     # Stores the first byte of $s2 into $t4.
 	
 	
-   dec_condition:
-	bne $t3, $t7, dec_convert # Check if $s1 =/= decimal
-	bne $t4, $t7, dec_convert # Check if $s2 =/= decimal
+   decCondition: nop
+	bne $t3, 0x00000030, decConvert # Check if $s1 =/= decimal
+	bne $t4, 0x00000030, decConvert # Check if $s2 =/= decimal
 	
-   dec_convert:
+   decConvert: nop
    	# Subtract ASCII code value, leave as signed decimal
    	
-   hex_condition:
-	beq $t1, $t9, hex_convert # Check if x($s1) = x
-	beq $t2, $t9, hex_convert # Check if x($s2) = x
+   hexCondition: nop
+	beq $t1, 0x00000078, hexConvert1 # Check if x($s1) = x
+	beq $t2, 0x00000078, hexConvert2 # Check if x($s2) = x
 	
-   hex_convert:
+   hexConvert1: nop
+   hexConvert2: nop
    	# Subtract ASCII value
-   	# Convert to binary
-   	# Convert to signed decimal
+   	# 0 ASCII - 48 = 0 Decimal (0-9)
+   	# A ASCII - 55 = 10 Decimal (A-F)
    	
-   bin_condition:
-	beq $t1, $t8, bin_convert # Check if b($s1) = b
-	beq $t2, $t8, bin_convert # Check if b($s2) = b
-	
-   bin_convert:
-   	# Subtract ASCII value
+   	# while (n=/= null char)
+   	# i = lb($t0)
+   	# RS = 16*RS
+   	# RS = RS + i
+   	# $t0 + 1
+   	# jump top loop
+   	
+   	# Shift left upto MSB
+   	# Shift right arithmetic to sign extend MSB
    	# Convert to signed decimal
-   
-   endProgram:
+
+   	
+   binCondition: nop
+	beq   $t1, 0x00000062, binConvert1 # Check if b($s1) = b
+	beq   $t2, 0x00000062, binConvert2 # Check if b($s2) = b
+	j     continue                     # Else not true, continue srunning program
+	
+	li    $t9, 0
+	li    $t8, 0
+	li    $t7, 0
+	li    $t6, 0
+	li    $t5, 0
+
+   binConvert1: nop
+   binConvert2: nop
+   	# Subtract ASCII value
+   	# 0 ASCII - 48 = 0 Decimal
+   	beq   $t9, 8, exitBin           # Counter register for 8 bytes
+   	
+   	lb    $t8, testArray($s2)       # Take byte from $s2 and load it into $t8
+   	subi  $t8, $t8, -48             # Subtract number value for ASCII -> decimal in $t8
+   	sb    $t8, 0x03($s2)       # Store byte from $t8 back into $s2
+   	addi  $t9, $t9, 1               # Add to counter
+   	
+   	j     binConvert2               # Jump to repeat loop
+   	
+   exitBin: nop
+   	li    $t9, 0
+   exitBin2: nop
+   	beq   $t9, 8, continue          # Counter register for 8 bytes
+   	lb    $t7, 0x03($s2)            # i = lb($t0)
+   	mul   $t6, $t6, 2               # RS = 2*RS
+   	add   $t6, $t6, $t7             # RS = RS + i
+   	addi  $s2, $s2, 1               # $t0 + 1
+   	addi  $t9, $t9, 1               # Add to counter
+   	
+   	j     exitBin2                   # Jump to repeat loop
+  
+   continue: nop
+   	sll $t6, $t6, 24                # Shift left by 24 bits
+   	sra $s2, $t6, 24                # Sign extend $t6 and store resultant into $s2
+   	
+   endProgram: nop
 	# Tell the program to terminate main command.
 	li $v0, 10
 	syscall
@@ -114,14 +161,14 @@
 # PROCEDURE LABELS
 
 	# Prints a new line character.
-	printLine:
+	printLine: nop
 	li $v0, 4
 	la $a0, newLine
 	syscall
 	jr $ra
 	
 	# Prints a space character.
-	printSpace:
+	printSpace: nop
 	li $v0, 4
 	la $a0, space
 	syscall
