@@ -400,6 +400,7 @@
    	mflo  $t9          # Quotient carries to next iteration
    	addi  $sp, $sp, 4
    	addi  $t6, $t6, 1
+   	addi  $t0, $t0, 1
    	j remainderLoop
    	
    exitRemainder: nop
@@ -410,14 +411,14 @@
    	addi  $sp, $sp, -4
    	subi  $t6, $t6, 1
    	addi  $t7, $t7, 4
-   	addi  $t5, $t5, 1
 	
 	j exitRemainder
    ASCIIexit: nop
    	li $a0, 0
    	li $t7, 0
    	li $t3, 0
-   	li $t4, 1
+   	li $t4, 0
+   	addi $t0, $t0, 0
    	   	
    	blt $s0, 0, negative
    	j ASCIIPRINT
@@ -429,13 +430,14 @@
    	li $a0, 0
    	li $t7, 0
    	li $t3, 0
-   	li $t4, 1
+   	li $t4, 0
+   	addi $t0, $t0, 0
    	
    ASCIIPRINT: nop
 	
 	lw    $t3, ascii_array($t7)
    	addi  $t3, $t3, 0x30
-   	beq   $t4, $t5, finalPrint
+   	beq   $t4, $t0, finalPrint
 	sb    $t3, ascii_array($a0)    # Store converted value into int_array
 	
 	addi  $t7, $t7, 4	       # increment int_array address
