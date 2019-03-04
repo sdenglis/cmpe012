@@ -110,7 +110,7 @@
    stringSorter: nop
 	
    hexCondition: nop
-	beq $t1, 0x00000078, hexConvert1 # Check if x($s1) = x
+	beq $t1, 0x00000078, hexConvert1   # Check if x($s1) = x
 	j hexConvert2
 	
    hexConvert1: nop
@@ -410,14 +410,15 @@
    	addi  $sp, $sp, -4
    	subi  $t6, $t6, 1
    	addi  $t7, $t7, 4
+   	addi  $t5, $t5, 1
 	
 	j exitRemainder
    ASCIIexit: nop
    	li $a0, 0
    	li $t7, 0
-   	li $t5, 0
    	li $t3, 0
-   	
+   	li $t4, 1
+   	   	
    	blt $s0, 0, negative
    	j ASCIIPRINT
    negative:
@@ -427,19 +428,19 @@
    	
    	li $a0, 0
    	li $t7, 0
-   	li $t5, 0
    	li $t3, 0
+   	li $t4, 1
    	
    ASCIIPRINT: nop
 	
 	lw    $t3, ascii_array($t7)
    	addi  $t3, $t3, 0x30
-   	beq   $t3, 0x30, finalPrint
+   	beq   $t4, $t5, finalPrint
 	sb    $t3, ascii_array($a0)    # Store converted value into int_array
 	
 	addi  $t7, $t7, 4	       # increment int_array address
    	addi  $a0, $a0, 1	       # increment ASCII pointer
-   	addi  $t5, $t5, 1              # increment counter
+   	addi  $t4, $t4, 1              # increment counter
    	
    	j     ASCIIPRINT               # Jump to repeat loop
    	
