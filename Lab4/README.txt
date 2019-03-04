@@ -41,7 +41,7 @@ for a given students success with this project.
 
 ++Did you collaborate with anyone on this lab? Please list who you collaborated
 with and the nature of your collaboration.
-==No, this time I was left on my own to flail around. I went to TA's during section
+==No, this time I was left on my own to flail around. I went up to TA's during section
 and asked for assistance, all of them giving me higher-level help with my pseudo code.
 In the end, I was left on my own to figure out the errors and debug my content in
 order to produce a fully-functioning solution.
