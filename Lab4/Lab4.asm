@@ -14,8 +14,17 @@
 # $s0: Stores summation of $s1 & $s2 values.
 # $s1: Holds 32-bit 2SC of first value.
 # $s2: Holds 32-bit 2SC of second value.
-# $t0: Temporary Register.
+# $t0: Temporary Register (usage varies depending on loop conditional).
 # $t1: Temporary Register.
+# $t2: Temporary Register.
+# $t3: Temporary Register.
+# $t4: Temporary Register.
+# $t5: Temporary Register.
+# $t6: Temporary Register.
+# $t7: Temporary Register.
+# $t8: Temporary Register.
+# $t9: Temporary Register.
+# $sp: Stack pointer used to push and pop items off the stack.
 # $v0: Syscall Register.
 # $a0: Arguments register.
 #
@@ -27,11 +36,11 @@
 # Print input feedback with prompt.
 # Convert each string into 32-bit two's compliment numbers.
 # Convert ASCII -> hex -> signed decimal.
-   # Subtract ASCII conversion value.
-   # Use running sums to convert binary into signed integer.
+# Subtract ASCII conversion value.
+# Use running sums to convert binary into signed integer.
 # Convert ASCII -> binary -> signed decimal.
-   # Subtract ASCII conversion value.
-   # Use running sums to convert binary into signed integer.
+# Subtract ASCII conversion value.
+# Use running sums to convert binary into signed integer.
 # Perform addition operation and store sum into $s0.
 # Convert resultant value and manipulate into a base(4) signed integer.
 # Print final signed magnitude to display with no leading 0's.
@@ -452,21 +461,3 @@
         # Tell the program to terminate main command.
 	li $v0, 10
 	syscall
-	
-	
-##########################################################################
-# PROCEDURE LABELS
-
-	# Prints a new line character.
-	printLine: nop
-	li $v0, 4
-	la $a0, newLine
-	syscall
-	jr $ra
-	
-	# Prints a space character.
-	printSpace: nop
-	li $v0, 4
-	la $a0, space
-	syscall
-	jr $ra
