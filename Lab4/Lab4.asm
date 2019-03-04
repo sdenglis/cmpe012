@@ -38,10 +38,9 @@
 #
 ##########################################################################
 
-
-
 .data	
 	feedback:    .asciiz "You entered the numbers:\n"
+	output:      .asciiz "The sum in base 4 is:\n"
 
 	# New line character
 	newLine:     .asciiz "\n"
@@ -49,10 +48,14 @@
 	space:       .asciiz " "
 	# Null character
 	null:        .asciiz ""
+	# Negative sign
+	negSign:     .asciiz "-"
 	
 	# Maximum size of input is 8 bits for binary value + 2-bit 0b preface.
 	int_array:   .word 2      # or .space 8
-	ascii_array: .word 2
+	ascii_array: .space 8
+	
+	
 	
 .text
    main: nop
@@ -78,47 +81,232 @@
 	li $v0, 4             # Print ASCII syscall
 	syscall
 	
+	# Prints a new line character.
+	li $v0, 4
+	la $a0, newLine
+	syscall
+	
+	# Prints a new line character.
+	li $v0, 4
+	la $a0, newLine
+	syscall
+	
+	# Prints a new line character.
+	li $v0, 4
+	la $a0, output
+	syscall
+	
+	
 	
    stringSorter: nop
-   
-   	#beq   $t9, 8, exitLoad
-   	#lw $a0, 0($a1)
-	#lb $s1, 0x02($a0)
-	#addi  $a1, $a1, 1
-   	#addi  $t9, $t9, 1
-   	
-   	exitLoad:
 	
    hexCondition: nop
 	beq $t1, 0x00000078, hexConvert1 # Check if x($s1) = x
-	beq $t2, 0x00000078, hexConvert2 # Check if x($s2) = x
+	j hexConvert2
 	
    hexConvert1: nop
-   hexConvert2: nop
-   	# Subtract ASCII value
-   	# 0 ASCII - 48 = 0 Decimal (0-9)
-   	# A ASCII - 55 = 10 Decimal (A-F)
-   	
-   	# while (n=/= null char)
-   	# i = lb($t0)
-   	# RS = 16*RS
-   	# RS = RS + i
-   	# $t0 + 1
-   	# jump top loop
-   	
-   	# Shift left upto MSB
-   	# Shift right arithmetic to sign extend MSB
-   	# Convert to signed decimal
-
-   	
-   binCondition: nop
-	beq   $t1, 0x00000062, binConvert1 # Check if b($s1) = b
-	beq   $t2, 0x00000062, binConvert2 # Check if b($s2) = b
-	j     continue                     # Else not true, continue running program
-	
-
-   binConvert1: nop
+   	li    $t9, 0	# initialize registers
+	li    $t8, 0
+	li    $t7, 0
+	li    $t6, 0
+	li    $t5, 0
+	li    $t4, 0
+	li    $t3, 0
+	li    $t0, 0
    
+   	lw    $a0, 0($a1)
+   
+      hexASCII: nop
+   	# Subtract ASCII value
+   	beq   $t6, 2, exitHex              # Counter register for 8 iterations
+ 
+	lb    $t8, 0x02($a0)               # Load contents of $a0 offset by 2
+   	bgt   $t8, 0x0000003A, letterCase
+   	j     numberCase
+   letterCase: nop
+   	subi  $t8, $t8, 55               
+	sb    $t8, int_array($t7)
+   	
+   	addi  $t7, $t7, 1	           # increment int_array address
+   	addi  $a0, $a0, 1	           # increment ASCII pointer
+   	addi  $t6, $t6, 1                  # increment counter
+   	
+   	j     hexASCII                     # Jump to repeat loop
+   numberCase: nop
+   	subi  $t8, $t8, 0x30               # Subtract number value for ASCII
+	sb    $t8, int_array($t7)     	   # Store converted value into int_array
+	
+	addi  $t7, $t7, 1	           # increment int_array address
+   	addi  $a0, $a0, 1	           # increment ASCII pointer
+   	addi  $t6, $t6, 1                  # increment counter
+   	
+   	j     hexASCII                     # Jump to repeat loop
+   	
+   exitHex: nop
+	li    $t9, 0
+	li    $t8, 0
+	li    $t7, 0
+	li    $t6, 0
+	li    $t5, 0
+	li    $t4, 0
+	li    $t3, 0
+	li    $t0, 0
+   
+   exitHEX: nop
+   	beq   $t6, 2, forwards            # Counter register for 8 bytes
+       
+        lb    $t8, int_array($t7)         # i = lb($t0)
+   	mul   $t9, $t9, 16                # RS = 16*RS
+   	add   $t9, $t9, $t8               # RS = RS + i
+   	addi  $t8, $t8, 1                 # $t0 + 1
+   	
+   	addi  $t7, $t7, 1		  # Add to int_array pointer
+   	addi  $t6, $t6, 1                 # Add to counter
+   	
+   	j     exitHEX                     # Jump to repeat loop
+	
+   forwards: nop
+   	sll   $t9, $t9, 24                # Shift left by 24 bits
+   	sra   $s1, $t9, 24                # Sign extend $t9 and store resultant into $s1
+   
+   hexConvert2: nop
+   	beq $t2, 0x00000078, HEXConvert2  # Check if x($s2) = x
+	j onwards
+	
+   HEXConvert2: nop
+   	li    $t9, 0	# initialize registers
+	li    $t8, 0
+	li    $t7, 0
+	li    $t6, 0
+	li    $t5, 0
+	li    $t4, 0
+	li    $t3, 0
+	li    $t0, 0
+   
+   	lw    $a0, 4($a1)
+   
+   hexASCII2: nop
+   	# Subtract ASCII value
+   	beq   $t6, 2, exitHex2             # Counter register for 8 iterations
+ 
+	lb    $t8, 0x02($a0)               # Load contents of $a0 offset by 2
+   	bgt   $t8, 0x0000003A, letterCase2
+   	j     numberCase2
+   letterCase2: nop
+   	subi  $t8, $t8, 55               
+	sb    $t8, int_array($t7)
+   	
+   	addi  $t7, $t7, 1	           # increment int_array address
+   	addi  $a0, $a0, 1	           # increment ASCII pointer
+   	addi  $t6, $t6, 1                  # increment counter
+   	
+   	j     hexASCII2                    # Jump to repeat loop
+   numberCase2: nop
+   	subi  $t8, $t8, 0x30               # Subtract number value for ASCII
+	sb    $t8, int_array($t7)     	   # Store converted value into int_array
+	
+	addi  $t7, $t7, 1	           # increment int_array address
+   	addi  $a0, $a0, 1	           # increment ASCII pointer
+   	addi  $t6, $t6, 1                  # increment counter
+   	
+   	j     hexASCII2                    # Jump to repeat loop
+   	
+   exitHex2: nop
+	li    $t9, 0
+	li    $t8, 0
+	li    $t7, 0
+	li    $t6, 0
+	li    $t5, 0
+	li    $t4, 0
+	li    $t3, 0
+	li    $t0, 0
+   
+   exitHEX2: nop
+   	beq   $t6, 2, forwards2         # Counter register for 8 bytes
+       
+        lb    $t8, int_array($t7)       # i = lb($t0)
+   	mul   $t9, $t9, 16              # RS = 16*RS
+   	add   $t9, $t9, $t8             # RS = RS + i
+   	addi  $t8, $t8, 1               # $t0 + 1
+   	
+   	addi  $t7, $t7, 1		# Add to int_array pointer
+   	addi  $t6, $t6, 1               # Add to counter
+   	
+   	j     exitHEX2                  # Jump to repeat loop
+	
+   forwards2: nop
+   	sll   $t9, $t9, 24              # Shift left by 24 bits
+   	sra   $s2, $t9, 24              # Sign extend $t9 and store resultant into $s2
+
+   onwards:
+   
+   
+   
+   binCondition: nop
+	beq   $t1, 0x00000062, binConvert1    # Check if b($s1) = b
+	j nextCase
+   binConvert1: nop
+	# Reset registers to clear up space
+   	li    $t9, 0
+	li    $t8, 0
+	li    $t7, 0
+	li    $t6, 0
+	li    $t5, 0
+	li    $t4, 0
+	li    $t3, 0
+	li    $t0, 0
+   
+   	lw    $a0, 0($a1)
+   	
+   binASCII: nop
+   	# Subtract ASCII value
+   	beq   $t6, 8, exitBin              # Counter register for 8 iterations
+   	
+	
+	lb    $t8, 0x02($a0)               # Load contents of $t9 offset by 2
+   	subi  $t8, $t8, 0x30               # Subtract number value for ASCII
+	sb    $t8, int_array($t7)     	   # Store converted value into int_array
+	
+	addi  $t7, $t7, 1	           # increment int_array address
+   	addi  $a0, $a0, 1	           # increment ASCII pointer
+   	addi  $t6, $t6, 1                  # increment counter
+   	
+   	j     binASCII                     # Jump to repeat loop
+   	
+   exitBin: nop
+	li    $t9, 0
+	li    $t8, 0
+	li    $t7, 0
+	li    $t6, 0
+	li    $t5, 0
+	li    $t4, 0
+	li    $t3, 0
+	li    $t0, 0
+   	
+   exitBIN: nop
+   	beq   $t6, 8, continue              # Counter register for 8 bytes
+       
+        lb    $t8, int_array($t7)           # i = lb($t0)
+   	mul   $t9, $t9, 2                   # RS = 2*RS
+   	add   $t9, $t9, $t8                 # RS = RS + i
+   	addi  $t8, $t8, 1                   # $t0 + 1
+   	
+   	addi  $t7, $t7, 1		    # Add to int_array pointer
+   	addi  $t6, $t6, 1                   # Add to counter
+   	
+   	j     exitBIN                       # Jump to repeat loop
+	# Running Sum should equal the contents of register $t9
+	
+   continue: nop
+   	sll   $t9, $t9, 24                  # Shift left by 24 bits
+   	sra   $s1, $t9, 24                  # Sign extend $t9 and store resultant into $s1
+   
+   
+   
+   nextCase: nop
+	beq   $t2, 0x00000062, binConvert2  # Check if b($s2) = b
+	j     exitSorter
+   binConvert2: nop
    	# Reset registers to clear up space
    	li    $t9, 0
 	li    $t8, 0
@@ -129,29 +317,24 @@
 	li    $t3, 0
 	li    $t0, 0
    
-   
-    	la    $t7, int_array           # Prepare address of int_array
-   	#la    $t9, ascii_array
    	lw    $a0, 4($a1)
    	
-   binConvert2: nop
+   binASCII2: nop
    	# Subtract ASCII value
    	# 0 ASCII - 48 = 0 Decimal
-   	beq   $t6, 8, exitBin          # Counter register for 8 iterations
-   	
+   	beq   $t6, 8, exitBin2         # Counter register for 8 iterations
 	
-	lb    $t8, 0x02($a0)               # Load contents of $t9 offset by 2
+	lb    $t8, 0x02($a0)           # Load contents of $t9 offset by 2
    	subi  $t8, $t8, 0x30           # Subtract number value for ASCII
-	sb    $t8, int_array($t7)     	       # Store converted value into int_array
+	sb    $t8, int_array($t7)      # Store converted value into int_array
 	
 	addi  $t7, $t7, 1	       # increment int_array address
    	addi  $a0, $a0, 1	       # increment ASCII pointer
    	addi  $t6, $t6, 1              # increment counter
    	
-   	j     binConvert2              # Jump to repeat loop
+   	j     binASCII2                # Jump to repeat loop
    	
-   exitBin: nop
-   
+   exitBin2: nop
 	li    $t9, 0
 	li    $t8, 0
 	li    $t7, 0
@@ -161,31 +344,112 @@
 	li    $t3, 0
 	li    $t0, 0
    	
-   exitBin2: nop
-   
-   	beq   $t6, 8, continue          # Counter register for 8 bytes
+   exitBIN2: nop
+   	beq   $t6, 8, continue2         # Counter register for 8 bytes
        
-        lb    $t8, int_array($t7)               # i = lb($t0)
+        lb    $t8, int_array($t7)       # i = lb($t0)
    	mul   $t9, $t9, 2               # RS = 2*RS
    	add   $t9, $t9, $t8             # RS = RS + i
    	addi  $t8, $t8, 1               # $t0 + 1
    	
-   	addi  $t7, $t7, 1		# Add to int_array pointer
+   	addi  $t7, $t7, 1               # Add to int_array pointer
    	addi  $t6, $t6, 1               # Add to counter
    	
-   	j     exitBin2                  # Jump to repeat loop
-  
-  
+   	j     exitBIN2                  # Jump to repeat loop
 	# Running Sum should equal the contents of register $t9
 	
-	
-   continue: nop
+   continue2: nop
+   	sll   $t9, $t9, 24              # Shift left by 24 bits
+   	sra   $s2, $t9, 24              # Sign extend $t9 and store resultant into $s2
+   	
+   exitSorter: nop
+   	li    $t9, 0
+	li    $t8, 0
+	li    $t7, 0
+	li    $t6, 0
+	li    $t5, 0
+	li    $t4, 0
+	li    $t3, 0
+	li    $t0, 0
    
-   	sll $t9, $t9, 24                # Shift left by 24 bits
-   	sra $s2, $t9, 24                # Sign extend $t6 and store resultant into $s2
+   	add   $s0, $s1, $s2
+   	move  $t9, $s0
+   	
+   remainderLoop: nop
+   	beq   $t9, 0, exitRemainder
+   	div   $t9, $t9, 4
+
+   	mfhi  $t8          # Remainer stored to stack
+   	
+   	blt $t8, 0, absolute
+   	j skip
+   absolute: nop
+   	sub $t8, $zero, $t8
+   skip: nop
+   	
+   	sw    $t8, 0($sp)
+   	mflo  $t9          # Quotient carries to next iteration
+   	addi  $sp, $sp, 4
+   	addi  $t6, $t6, 1
+   	j remainderLoop
+   	
+   exitRemainder: nop
+   	beq   $t6, -1, ASCIIexit
+   	lw    $a0, -4($sp)
+
+   	sw    $a0, ascii_array($t7)
+   	addi  $sp, $sp, -4
+   	subi  $t6, $t6, 1
+   	addi  $t7, $t7, 4
+
+	#li $v0, 1
+	#syscall
+	
+	j exitRemainder
+   ASCIIexit: nop
+   	li $a0, 0
+   	li $t7, 0
+   	li $t5, 0
+   	li $t3, 0
+   	
+   	blt $s0, 0, negative
+   	j ASCIIPRINT
+   negative:
+   	li $v0, 4
+	la $a0, negSign
+	syscall
+   	
+   	li $a0, 0
+   	li $t7, 0
+   	li $t5, 0
+   	li $t3, 0
+   	
+   ASCIIPRINT: nop
+	
+	lw    $t3, ascii_array($t7)
+   	addi  $t3, $t3, 0x30
+   	beq   $t3, 0x30, finalPrint
+	sb    $t3, ascii_array($a0)    # Store converted value into int_array
+	
+	addi  $t7, $t7, 4	       # increment int_array address
+   	addi  $a0, $a0, 1	       # increment ASCII pointer
+   	addi  $t5, $t5, 1              # increment counter
+   	
+   	j     ASCIIPRINT               # Jump to repeat loop
+   	
+   finalPrint: nop
+   
+	la $a0 ascii_array
+   	li $v0, 4
+	syscall
+	
+   	li $v0, 4
+   	la $a0 newLine
+	syscall
+   	
    	
    endProgram: nop
-	# Tell the program to terminate main command.
+        # Tell the program to terminate main command.
 	li $v0, 10
 	syscall
 	
