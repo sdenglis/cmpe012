@@ -369,7 +369,7 @@
    	beq   $t9, 0, exitRemainder        # End when we reach 0 and can no longer divide.
    	div   $t9, $t9, 4                  # Divide the sum by 4(base 4).
 
-   	mfhi  $t8                          # Remainer stored to $t8
+   	mfhi  $t8                          # Remainder stored to $t8
    	
    	blt   $t8, 0, absolute             # Remove negative, we will account for it later.
    	j     skip                         # Else positive, continue running.
@@ -377,7 +377,7 @@
    	sub   $t8, $zero, $t8              # Absolute value command
    skip: nop
    	
-   	sw    $t8, 0($sp)                  # Remainer is saved to stack
+   	sw    $t8, 0($sp)                  # Remainder is saved to stack
    	mflo  $t9                          # Quotient carries to next iteration
    	addi  $sp, $sp, 4                  # Increase the stack pointer
    	addi  $t6, $t6, 1                  # Increase arbitrary counter for subsequent loops
