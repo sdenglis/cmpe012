@@ -71,8 +71,8 @@
 	
 	# Display user input.
 	lw $a0, 0($a1)
-	lb $t1, 0x01($a0)
-	lb $t3, 0($a0)
+	lb $t1, 0x01($a0)                  #Stores the second portion of $a0 into $t1
+	lb $t3, 0($a0)                     # Stores the first portion of $a0 into $t3
 	li $v0, 4                          # Print ASCII syscall
 	syscall
 
@@ -83,8 +83,8 @@
 	
 	# Display second user input.
 	lw $a0, 4($a1)
-	lb $t2, 1($a0)   
-	lb $t4, 0($a0)                     # Stores the second portion of $a0 into $t2
+	lb $t2, 1($a0)                     # Stores the second portion of $a0 into $t2
+	lb $t4, 0($a0)                     # Stores the first portion of $a0 into $t4
 	li $v0, 4                          # Print ASCII syscall
 	syscall
 	
@@ -106,8 +106,8 @@
 	
 	
    decCondition: nop
-	blt   $t1, 0x00000040, decConvert1
-	j     nextDec
+	blt   $t1, 0x00000040, decConvert1 # Check if input is non-binary or non-hex
+	j     nextDec                      # Else, continue running program
 	
    decConvert1: nop
    	li    $t9, 0
@@ -117,29 +117,29 @@
 	li    $t5, 0
 	li    $t0, 0
    	lw    $a0, 0($a1)
-	beq   $t3, 0x0000002D, negDEC
-	j     decASCII
+	beq   $t3, 0x0000002D, negDEC      # Evaluate whether first decimal input is negative
+	j     decASCII                     # Else, continue evaluating using default criteria
 	
    negDEC: nop
-   	lb    $t8, 0x01($a0)   
-   	beq   $t8, 0x00, exitDec
+   	lb    $t8, 0x01($a0)               # Load first input with offset to avoid negative
+   	beq   $t8, 0x00, exitDec           # Exit loop once reached null terminator
    	subi  $t8, $t8, 0x30               # Subtract number value for ASCII
 	sb    $t8, int_array($t7)     	   # Store converted value into int_array
 	
 	addi  $t7, $t7, 1	           # increment int_array address
    	addi  $a0, $a0, 1	           # increment ASCII pointer
-   	addi  $t0, $t0, 1
+   	addi  $t0, $t0, 1                  # Increment arbitrary counter
    	
    	j     negDEC                       # Jump to repeat loop
    decASCII: nop
-   	lb    $t8, 0x00($a0)   
-   	beq   $t8, 0x00, exitDec
+   	lb    $t8, 0x00($a0)               # NORMAL CASE: load first input with no offset
+   	beq   $t8, 0x00, exitDec           # Exit loop when reached null terminator
    	subi  $t8, $t8, 0x30               # Subtract number value for ASCII
 	sb    $t8, int_array($t7)     	   # Store converted value into int_array
 	
 	addi  $t7, $t7, 1	           # increment int_array address
    	addi  $a0, $a0, 1	           # increment ASCII pointer
-   	addi  $t0, $t0, 1
+   	addi  $t0, $t0, 1                  # Increment arbitrary counter
    	
    	j     decASCII                     # Jump to repeat loop
    exitDec: nop
@@ -150,7 +150,7 @@
 	li    $t5, 0
    	
    exitDEC: nop
-   	beq   $t6, $t0, contDec            # Counter register for 8 bytes
+   	beq   $t6, $t0, contDec            # Counter register replicates number of iterations used to convert ASCII (number bits)
         
         lb    $t8, int_array($t7)          # i = lb($t0)
    	mul   $t9, $t9, 10                 # RS = 10*RS
@@ -158,22 +158,22 @@
    	addi  $t8, $t8, 1                  # $t0 + 1
    	
    	addi  $t7, $t7, 1		   # Add to int_array pointer
-   	addi  $t6, $t6, 1                  # Add to counter
+   	addi  $t6, $t6, 1                  # Add to loop counter
    	
    	j     exitDEC                      # Jump to repeat loop
 	                                   # Running Sum should equal the contents of register $t9
    contDec: nop
-   	beq   $t3, 0x0000002D, negINV
-   	j     elseShift
+   	beq   $t3, 0x0000002D, negINV      # Check if negative decimal input
+   	j     elseShift                    # Else, skip subsequent block of code
    	
    negINV: nop
-   	nor   $t9, $t9, $t9
-   	addi  $t9, $t9, 1
+   	nor   $t9, $t9, $t9                # Invert the register
+   	addi  $t9, $t9, 1                  # Add 1
    
    elseShift: nop
    	sll   $t9, $t9, 24                 # Shift left by 24 bits
    	sra   $s1, $t9, 24                 # Sign extend $t9 and store resultant into $s1
-	li    $t0, 1
+	li    $t0, 1                       # Add to counter for next decimal case evaluation
 	
    nextDec: nop
   	li    $t9, 0
@@ -182,12 +182,12 @@
 	li    $t6, 0
 	li    $t5, 0
    	lw    $a0, 0($a1)
-	blt   $t2, 0x00000040, decConvert2
-	j     nextDec2
+	blt   $t2, 0x00000040, decConvert2 # Check if second user input is non-binary and non-hex
+	j     nextDec2                     # Else, continue with program, skipping this chunk of code
 	
    decConvert2: nop
-   	beq   $t0, 1, DECIMAL
-   	j     NOTDECIMAL
+   	beq   $t0, 1, DECIMAL              # Check if a decimal case has been evaluated before this point
+   	j     NOTDECIMAL                   # Else, jump to NOTDECIMAL label
    	
    DECIMAL: nop
    	li    $t9, 0                       # Reload registers.
@@ -196,8 +196,8 @@
 	li    $t6, 0
 	li    $t5, 0
 	li    $t0, 0
-   beq        $t4, 0x0000002D, NEGDEC2
-	j     DECASCII2
+   	beq   $t4, 0x0000002D, NEGDEC2     # Check if input is negative
+	j     DECASCII2                    # Else, continue to DECASCII2
 	
    NEGDEC2: nop
    	lb    $t8, -3($a0)   
@@ -220,6 +220,7 @@
 	addi  $t7, $t7, 1	           # increment int_array address
    	addi  $a0, $a0, 1	           # increment ASCII pointer
    	addi  $t0, $t0, 1
+   	addi  $t6, $t6, 1
    	
    	j     DECASCII2                    # Jump to repeat loop
   
@@ -227,11 +228,10 @@
    	li    $t9, 0                       # Reload registers.
 	li    $t8, 0
 	li    $t7, 0
-	li    $t6, 0
 	li    $t5, 0
 	li    $t0, 0
-	beq   $t4, 0x0000002D, negDEC2
-	j     decASCII2
+	beq   $t4, 0x0000002D, negDEC2     # Check if negative again
+	j     decASCII2                    # Else, skip to decASCII2
   
     negDEC2: nop
    	lb    $t8, -3($a0)   
@@ -266,7 +266,7 @@
 	li    $t5, 0
    	
    exitDEC2: nop
-   	beq   $t6, $t0, contDec2           # Counter register for 8 bytes
+   	beq   $t6, $t0, contDec2           # Counter register until $t6 = $t0
        
         lb    $t8, int_array($t7)          # i = lb($t0)
    	mul   $t9, $t9, 10                 # RS = 10*RS
@@ -279,16 +279,16 @@
    	j     exitDEC2                     # Jump to repeat loop
 
    contDec2: nop
-   	beq   $t4, 0x0000002D, negINV2
-   	j     elseShift2
+   	beq   $t4, 0x0000002D, negINV2     # If negative input
+   	j     elseShift2                   # Else, skip to elseShift2
    	
    negINV2: nop
-   	nor   $t9, $t9, $t9
-   	addi  $t9, $t9, 1
+   	nor   $t9, $t9, $t9                # Invert register $t9
+   	addi  $t9, $t9, 1                  # Add 1
    
    elseShift2: nop
    	sll   $t9, $t9, 24                 # Shift left by 24 bits
-   	sra   $s2, $t9, 24                 # Sign extend $t9 and store resultant into $s1
+   	sra   $s2, $t9, 24                 # Sign extend $t9 and store resultant into $s2
 	
    nextDec2: nop
 	
