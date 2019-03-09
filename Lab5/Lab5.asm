@@ -6,9 +6,12 @@
 #sdenglis
 #########################
 .data
-	inputString:       .space 400 # 100 * 4 per character
-	inputKey:          .space 400
-	resultingString:   .space 400
+	inputString:       .space 100   # 100 * 4? per character
+	inputKey:          .space 100
+	resultingString:   .space 100
+	operationArray:    .space 100   # single character reserved for E, D, X?
+	
+	invalidInput:      .asciiz "Invalid input: please input E, D, or X."
 
 .text
 
@@ -32,6 +35,55 @@ give_prompt:
 # return:     $v0 - address of the user input string 
 #-------------------------------------------------------------------- 
 
+	li $v0, 4                      # prints prompt loaded into $a0
+	syscall                        # execute command
+
+bne $a1, 0, skipFirst
+	li $v0, 8                      # prepares for user input
+	la $a0, operationArray         # stores value into operation array
+	li $a1, 100                    # limit on number of characters
+	syscall
+	
+la      $v0, operationArray            # move operation array address to $v0
+ 
+ 	move 	$s0, $v0	       # $s0 contains address of E,D or X
+	
+	lb	$t0, ($s0)	       # check for validity of user input
+	beq  	$t0, 88, validInput    # X is valid input!
+	beq  	$t0, 68, validInput    # D is valid input!
+	beq  	$t0, 69, validInput    # E is valid input!
+elseInput:
+	la 	$a0, invalidInput
+	li 	$v0, 4
+	syscall 
+
+	j loop                         # hard reset to obtain new, valid input
+validInput:
+	jr $ra                         # jump back to caller address
+
+skipFirst:
+bne $a1, 1, skipSecond
+	li $v0, 8                      # prepares for user input
+	la $a0, inputKey               # stores value into array
+	li $a1, 100                    # limit on number of characters
+	syscall
+ 
+la      $v0, inputKey                  # move inputKey array address to $v0
+ 
+	jr $ra                         # jump back to caller address
+
+skipSecond:
+# no need for final condition, $a1 has limited range (0-2)
+	li $v0, 8                      # prepares for user input
+	la $a0, inputString            # stores value into array
+	li $a1, 100                    # limit on number of characters
+	syscall
+ 
+la      $v0, inputString               # move inputString array address to $v0
+ 
+	jr $ra                         # jump back to caller address
+
+
 cipher:
 #--------------------------------------------------------------------
 # cipher 
@@ -48,6 +100,7 @@ cipher:
 # return:     $v0 - address of resulting encrypted/decrypted string 
 #--------------------------------------------------------------------
 
+
 compute_checksum:
 #-------------------------------------------------------------------- 
 # compute_checksum
@@ -59,6 +112,7 @@ compute_checksum:
 #
 # return:     $v0 - numerical checksum result (value should be between 0 - 25)
 #--------------------------------------------------------------------
+
 
 encrypt:
 #-------------------------------------------------------------------- 
@@ -73,6 +127,7 @@ encrypt:
 # return:     $v0 - encrypted character 
 #-------------------------------------------------------------------- 
 
+
 decrypt:
 #-------------------------------------------------------------------- 
 # decrypt
@@ -86,6 +141,7 @@ decrypt:
 # return:     $v0 - decrypted character 
 #-------------------------------------------------------------------- 
 
+
 check_ascii:
 #-------------------------------------------------------------------- 
 # check_ascii 
@@ -97,6 +153,7 @@ check_ascii:
 #
 # return:     $v0 - 0 if uppercase, 1 if lowercase, -1 if not letter
 #-------------------------------------------------------------------- 
+
 
 print_strings:
 #-------------------------------------------------------------------- 
