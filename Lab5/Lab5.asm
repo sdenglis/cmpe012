@@ -12,8 +12,6 @@
 	operationArray:    .space 100   # single character reserved for E, D, X?
 	
 	invalidInput:      .asciiz      "Invalid input: please input E, D, or X."
-	upperAl:           .asciiz      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	lowerAl:           .asciiz      "abcdefghijklmnopqrstuvwxyz"
 	Encrypted:         .asciiz      "<Encrypted> "
 	Decrypted:         .asciiz      "<Decrypted> "
 
@@ -171,6 +169,7 @@ skipDecrypt: nop
 	addu $sp,  $sp, 4            # increment stack pointer by 4
 	
 endCipher: nop
+	la $v0, resultingString
 	jr $ra
 
 
@@ -217,6 +216,7 @@ encrypt: nop
 # return:     $v0 - encrypted character 
 #-------------------------------------------------------------------- 
 
+	la   $t7,  resultingString
 	move $a1,  $v0                 # sets $a1 to the checksum result generated in XOR function
 encryptLoop:
 	lb   $a2, ($s2)                # stores character to encrypt into $a2
@@ -230,12 +230,14 @@ beq     $a2, 0,    exitEncrypt         # exit loop when we reach a null terminat
 	lw   $ra, ($sp)                # pop stack, obtain previously saved $ra value
 	addu $sp,  $sp, 4              # increment stack pointer by 4
 	
-	sb   $a2,                      # store shifted character into final array structure
+	sb   $a2, ($t7)                # store shifted character into final array structure
 	addi $s2, $s2, 1               # add to address pointer for inputString
+	addi $t7, $t7, 1               # increment resultingString address for each loop iteration
 	j encryptLoop                  # repeat
 
 
 exitEncrypt: nop
+	li $t7, 0                      # clear register space
 	jr $ra                         # return to cipher command address
 
 decrypt: nop
@@ -325,66 +327,39 @@ beq  	$t0, 68, DecryptedCase         # check if program decrypted string
 beq  	$t0, 69, EncryptedCase         # check if program encrypted string
 
 DecryptedCase: nop
-	la $a0, Encrypted              # <Encrypted> 
-	li $v0, 4                      # prints prompt loaded into $a0
+	la $a0,  Encrypted             # <Encrypted> 
+	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 	
-	la $a0, $s3                    # <Encrypted> string
-	li $v0, 4                      # prints prompt loaded into $a0
+	la $a0, ($s3)                  # <Encrypted> string
+	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 	
-	la $a0, Decrypted              # <Decrypted> 
-	li $v0, 4                      # prints prompt loaded into $a0
+	la $a0,  Decrypted             # <Decrypted> 
+	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 
-	la $a0, $s2                    # <Decrypted> string
-	li $v0, 4                      # prints prompt loaded into $a0
+	la $a0, ($s2)                  # <Decrypted> string
+	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 	j  exitPrint                   # skip next case 
 	
 EncryptedCase: nop
-	la $a0, Encrypted              # <Encrypted> 
-	li $v0, 4                      # prints prompt loaded into $a0
+	la $a0,  Encrypted             # <Encrypted> 
+	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 	
-	la $a0, $s3                    # <Encrypted> string
-	li $v0, 4                      # prints prompt loaded into $a0
+	la $a0, ($s3)                  # <Encrypted> string
+	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 	
-	la $a0, Decrypted              # <Decrypted> 
-	li $v0, 4                      # prints prompt loaded into $a0
+	la $a0,  Decrypted             # <Decrypted> 
+	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 
-	la $a0, $s2                    # <Decrypted> string
-	li $v0, 4                      # prints prompt loaded into $a0
+	la $a0, ($s2)                  # <Decrypted> string
+	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 	
 exitPrint: nop
 	jr $ra                         # return to caller address
-
-
-
-
-# Subroutines. functions that are called. return functions, know how to use stack to preserve return address across calls
-# caesar cipher. Look at sample output. xor bits together, mod with cap of alphabet, and that'll be your shift value
-# Error check if not E, D, or X, input --> invalid input!
-# Running sum with XOR for checksum!
-# array .space 100 in this case, I suppose
-# Take input, $a1 takes number of characters willing to read
-# load $a2 with address of where you want to store (an input array)
-# Store return addresses to the stack and pop stack to preserve ra over function calls!!! (nested subroutines) bottom up. subtract $sp by 4
-#also have to store to stack the $s registers, preserve across subroutines
-#subi $sp $sp, 4
-#sw $ra, ($sp)
-
-#...
-
-#lw $ra, ($sp)
-#addi $sp, $sp, 4
-
-#jr $ra
-
-#get started with give_prompt for user input, not too bad
-#after that, implement print_strings to see data getting output
-#and then finnagle with others checkascii and computechecksum are helper functions
-#then finish others!
