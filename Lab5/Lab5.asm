@@ -11,11 +11,11 @@
 	resultingString:   .space 100
 	operationArray:    .space 100   # single character reserved for E, D, X?
 	
-	invalidInput:      .asciiz "Invalid input: please input E, D, or X."
+	invalidInput:      .asciiz      "Invalid input: please input E, D, or X."
 
 .text
 
-give_prompt:
+give_prompt: nop
 #-------------------------------------------------------------------- 
 # give_prompt
 #
@@ -52,16 +52,16 @@ la      $v0, operationArray            # move operation array address to $v0
 	beq  	$t0, 88, validInput    # X is valid input!
 	beq  	$t0, 68, validInput    # D is valid input!
 	beq  	$t0, 69, validInput    # E is valid input!
-elseInput:
-	la 	$a0, invalidInput
-	li 	$v0, 4
+elseInput: nop
+	la 	$a0, invalidInput      # else, invalid input.
+	li 	$v0, 4                 # print invalid feedback
 	syscall 
 
 	j loop                         # hard reset to obtain new, valid input
-validInput:
+validInput: nop
 	jr $ra                         # jump back to caller address
 
-skipFirst:
+skipFirst: nop
 bne $a1, 1, skipSecond
 	li $v0, 8                      # prepares for user input
 	la $a0, inputKey               # stores value into array
@@ -72,7 +72,7 @@ la      $v0, inputKey                  # move inputKey array address to $v0
  
 	jr $ra                         # jump back to caller address
 
-skipSecond:
+skipSecond: nop
 # no need for final condition, $a1 has limited range (0-2)
 	li $v0, 8                      # prepares for user input
 	la $a0, inputString            # stores value into array
@@ -83,8 +83,7 @@ la      $v0, inputString               # move inputString array address to $v0
  
 	jr $ra                         # jump back to caller address
 
-
-cipher:
+cipher: nop
 #--------------------------------------------------------------------
 # cipher 
 # 
@@ -100,21 +99,75 @@ cipher:
 # return:     $v0 - address of resulting encrypted/decrypted string 
 #--------------------------------------------------------------------
 
+	subu $sp,  $sp, 4            # save previous caller address before jumping to nested subroutine
+	sw   $ra, ($sp)              # push $ra to the stack
+	subu $sp,  $sp, 4            # save previous caller address before jumping to nested subroutine
+	sw   $a1, ($sp)              # push $a1 to the stack
+	
+	jal  compute_checksum        # jump to compute_checksum function
+	
+	lw   $a1, ($sp)              # pop stack, obtain previously saved $a1 value
+	addu $sp,  $sp, 4            # increment stack pointer by 4
+	lw   $ra, ($sp)              # pop stack, obtain previously saved $ra value
+	addu $sp,  $sp, 4            # increment stack pointer by 4
 
-compute_checksum:
+	lb   $t0, ($a0)	             # load first character of operationArray for condition check
+	
+bne  $t0,  68, skipDecrypt           # branch to next case if $t0 does not contain 'D'
+	subu $sp,  $sp, 4            # save previous caller address before jumping to nested subroutine
+	sw   $ra, ($sp)              # push $ra to the stack
+	
+	jal  decrypt
+	
+	lw   $ra, ($sp)              # pop stack, obtain previously saved $ra value
+	addu $sp,  $sp, 4            # increment stack pointer by 4
+	
+	j endCipher                  # skip encrypt block of code
+	
+skipDecrypt: nop
+# no need for branch statement since only two possible outcomes (Decrypt, Encrypt)
+	subu $sp,  $sp, 4            # save previous caller address before jumping to nested subroutine
+	sw   $ra, ($sp)              # push $ra to the stack
+	
+	jal  encrypt
+	
+	lw   $ra, ($sp)              # pop stack, obtain previously saved $ra value
+	addu $sp,  $sp, 4            # increment stack pointer by 4
+	
+endCipher: nop
+
+
+
+compute_checksum: nop
 #-------------------------------------------------------------------- 
 # compute_checksum
 # 
 # Computes the checksum by xor’ing each character in the key together. Then, 
 # use mod 26 in order to return a value between 0 and 25.
 #
-# arguments:  $a0 - address of key string
+# arguments:  $a1 - address of key string
 #
 # return:     $v0 - numerical checksum result (value should be between 0 - 25)
 #--------------------------------------------------------------------
 
+	li   $t9,  0         # initialize running XOR value
+XORloop: nop
+	lb   $t8, ($a1)      # load character from key string
+beq     $t8, 0,    exitXOR   # branch when string terminates
+	xor  $t9,  $t9, $t8  # XOR running sum with the loaded character
+	
+	addi $a1,  $a1, 1    # increment address pointer until we reach null terminator
+	j XORloop            # repeat
+exitXOR: nop
+	divu $t9,  $t9, 26   # divide running XOR by 26
+	mfhi $v0             # store remainder (mod) value into $v0
+	
+	li   $t9, 0          # clear up register space
+	li   $t8, 0          # clear up register space
+	
+	jr $ra               # return to cipher caller address
 
-encrypt:
+encrypt: nop
 #-------------------------------------------------------------------- 
 # encrypt
 #
@@ -128,7 +181,8 @@ encrypt:
 #-------------------------------------------------------------------- 
 
 
-decrypt:
+
+decrypt: nop
 #-------------------------------------------------------------------- 
 # decrypt
 #
@@ -142,7 +196,8 @@ decrypt:
 #-------------------------------------------------------------------- 
 
 
-check_ascii:
+
+check_ascii: nop
 #-------------------------------------------------------------------- 
 # check_ascii 
 #
@@ -155,7 +210,8 @@ check_ascii:
 #-------------------------------------------------------------------- 
 
 
-print_strings:
+
+print_strings: nop
 #-------------------------------------------------------------------- 
 # print_strings 
 #
