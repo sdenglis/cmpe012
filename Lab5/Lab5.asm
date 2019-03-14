@@ -6,10 +6,10 @@
 #sdenglis
 #########################
 .data
-	inputString:       .space 100  # reserved amount of character for each array, arbitrary
-	inputKey:          .space 100
-	resultingString:   .space 100
-	operationArray:    .space 100  
+	inputString:       .space 400  # reserved amount of character for each array, arbitrary
+	inputKey:          .space 400
+	resultingString:   .space 400
+	operationArray:    .space 400  
 	
 	invalidInput:      .asciiz     "Invalid input: please input E, D, or X."
 	Encrypted:         .asciiz     "<Encrypted> "
@@ -35,7 +35,7 @@ give_prompt: nop
    bne     $a1, 0, skipFirst
 	li $v0, 8                      # prepares for user input
 	la $a0, operationArray         # stores value into operation array
-	li $a1, 100                    # limit on number of characters
+	li $a1, 400                    # limit on number of characters
 	syscall
 	
    la   $v0,    operationArray         # move operation array address to $v0
@@ -59,7 +59,7 @@ skipFirst: nop
    bne     $a1, 1, skipSecond
 	li $v0, 8                      # prepares for user input
 	la $a0, inputKey               # stores value into array
-	li $a1, 100                    # limit on number of characters
+	li $a1, 400                    # limit on number of characters
 	syscall
  
    la   $v0, inputKey                  # move inputKey array address to $v0
@@ -70,7 +70,7 @@ skipSecond: nop
 # no need for final condition, $a1 has limited range (0-2)
 	li $v0, 8                      # prepares for user input
 	la $a0, inputString            # stores value into array
-	li $a1, 100                    # limit on number of characters
+	li $a1, 400                    # limit on number of characters
 	syscall
  
    la   $v0, inputString               # move inputString array address to $v0
