@@ -189,7 +189,7 @@ compute_checksum: nop
 	li   $t9,  0         # initialize running XOR value
 XORloop: nop
 	lb   $t8, ($a1)      # load character from key string
-beq     $t8, 0,    exitXOR   # branch when string terminates
+beq     $t8, 0x0A,    exitXOR   # branch when string reaches new line
 	xor  $t9,  $t9, $t8  # XOR running sum with the loaded character
 	
 	addi $a1,  $a1, 1    # increment address pointer until we reach null terminator
@@ -252,6 +252,29 @@ decrypt: nop
 #
 # return:     $v0 - decrypted character 
 #-------------------------------------------------------------------- 
+	la   $t7,  resultingString
+	move $a1,  $v0                 # sets $a1 to the checksum result generated in XOR function
+decryptLoop:
+	lb   $a2, ($s2)                # stores character to encrypt into $a2
+beq     $a2, 0,    exitDecrypt         # exit loop when we reach a null terminator
+	
+	subu $sp,  $sp, 4              # save previous caller address before jumping to nested subroutine
+	sw   $ra, ($sp)                # push $ra to the stack
+	
+	jal checkUpper2                # sort ascii characters and convert accordingly
+	
+	lw   $ra, ($sp)                # pop stack, obtain previously saved $ra value
+	addu $sp,  $sp, 4              # increment stack pointer by 4
+	
+	sb   $a2, ($t7)                # store shifted character into final array structure
+	addi $s2, $s2, 1               # add to address pointer for inputString
+	addi $t7, $t7, 1               # increment resultingString address for each loop iteration
+	j decryptLoop                  # repeat
+
+
+exitDecrypt: nop
+	li $t7, 0                      # clear register space
+	jr $ra                         # return to cipher command address
 
 
 
@@ -288,7 +311,7 @@ checkLower: nop                   # check for lower-case value
 bge    $a2, 97,   lower           # check if loaded character is above 'a'
 	j elseASCII               # else, non-letter character
 lower: nop
-ble    $s2, 122,  lowerTrue       # check if loaded character is below 'z'
+ble    $a2, 122,  lowerTrue       # check if loaded character is below 'z'
 	j elseASCII               # else, non-letter character
 
 lowerTrue: nop                    # function for lower-case value
@@ -302,6 +325,50 @@ lowerTrue: nop                    # function for lower-case value
 	j elseASCII               # end process and continue
 
 elseASCII: nop                    # else, treat as non-letter value
+	li $t9, 0                 # clear up register space
+	li $t8, 0
+	li $t5, 0
+	jr $ra
+
+
+
+checkUpper2: nop                   # check for upper-case value
+bge    $a2, 65,   upper2           # check if loaded character is above 'A'
+	j elseASCII2               # else, non-letter character
+upper2: nop
+ble    $a2, 90,   upperTrue2       # check if loaded character is below 'Z'
+	j checkLower2              # else, check if lower-case value
+
+upperTrue2: nop                    # function for upper-case value
+	li   $t5, 90 
+	sub  $t9, $t5, $a2         # subtract ascii character from base ascii value
+	add  $t9, $t9, $a1        # adds temporary value to XOR shift amount
+	abs  $t9, $t9             # ensures that we divide by a positive
+	divu $t9, $t9, 26         # divide temp value by 26
+	mfhi $t8                  # store mod value into $t8
+	sub  $a2, $t5, $t8        # add mod value to base ascii value, store back into $a2
+	
+	j elseASCII2               # end process and continue
+
+checkLower2: nop                   # check for lower-case value
+bge    $a2, 97,   lower2           # check if loaded character is above 'a'
+	j elseASCII2               # else, non-letter character
+lower2: nop
+ble    $a2, 122,  lowerTrue2       # check if loaded character is below 'z'
+	j elseASCII2               # else, non-letter character
+
+lowerTrue2: nop                    # function for lower-case value
+	li   $t5, 122
+	sub  $t9, $t5, $a2        # subtract ascii character from base ascii value
+	add  $t9, $t9, $a1        # adds temporary value to XOR shift amount
+	abs  $t9, $t9             # ensures that we divide by a positive
+	divu $t9, $t9, 26         # divide temp value by 26
+	mfhi $t8                  # store mod value into $t8
+	sub  $a2, $t5, $t8         # add mod value to base ascii value, store back into $a2
+	
+	j elseASCII2               # end process and continue
+
+elseASCII2: nop                    # else, treat as non-letter value
 	li $t9, 0                 # clear up register space
 	li $t8, 0
 	jr $ra
@@ -331,19 +398,19 @@ DecryptedCase: nop
 	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 	
-	la $a0, ($s3)                  # <Encrypted> string
+	la $a0, ($s2)                  # <Decrypted> string
 	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 	
 	la $a0,  Decrypted             # <Decrypted> 
 	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
-
-	la $a0, ($s2)                  # <Decrypted> string
+	
+	la $a0, ($s3)                  # <Encrypted> string
 	li $v0,  4                     # prints prompt loaded into $a0
 	syscall                        # execute command
 	j  exitPrint                   # skip next case 
-	
+		
 EncryptedCase: nop
 	la $a0,  Encrypted             # <Encrypted> 
 	li $v0,  4                     # prints prompt loaded into $a0
@@ -362,4 +429,27 @@ EncryptedCase: nop
 	syscall                        # execute command
 	
 exitPrint: nop
+	# clear all arrays!!!
+	la $t9, inputString
+	la $t8, inputKey
+	la $t7, resultingString
+	la $t6, operationArray
+	
+clearArrayRES: nop
+	lb $t5, ($t7)
+	beq $t5, 0x00, clearArrayINP
+	li $t5, 0
+	sb $t5, ($t7)
+	addi $t7, $t7, 1
+	j clearArrayRES
+	
+	clearArrayINP: nop
+	lb $t5, ($t9)
+	beq $t5, 0x00, EXITFINAL
+	li $t5, 0
+	sb $t5, ($t9)
+	addi $t9, $t9, 1
+	j clearArrayINP
+	
+EXITFINAL: nop
 	jr $ra                         # return to caller address
