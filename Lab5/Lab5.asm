@@ -43,6 +43,10 @@ give_prompt: nop
  	move 	$s0, $v0	       # $s0 contains address of E,D or X
 	
 	lb	$t0, ($s0)	       # check for validity of user input
+	addi    $s0,  $s0, 1
+	lb      $t1, ($s0)             # load next character 
+	subi    $s0,  $s0, 1           # restore $s0 value 
+	bne     $t1  10, elseInput     # if next closest character is not a new line, consider it invalid
 	beq  	$t0, 88, validInput    # X is valid input!
 	beq  	$t0, 68, validInput    # D is valid input!
 	beq  	$t0, 69, validInput    # E is valid input!
