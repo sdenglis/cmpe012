@@ -12,8 +12,10 @@
 	operationArray:    .space 400  
 	
 	invalidInput:      .asciiz     "Invalid input: please input E, D, or X."
+	outputPrompt:      .asciiz     "Here is the encrypted and decrypted string\n"
 	Encrypted:         .asciiz     "<Encrypted> "
 	Decrypted:         .asciiz     "<Decrypted> "
+	newLine:           .asciiz     "\n"
 
 .text
 
@@ -368,6 +370,15 @@ print_strings: nop
 #
 # return:     prints to console 
 #-------------------------------------------------------------------- 
+
+	la   $a0, newLine              # print new line after input prompts
+	li   $v0,  4
+	syscall
+	
+	la   $a0, outputPrompt         # print precursor to <> strings
+	li   $v0,  4
+	syscall
+
 
 	lb   $t0, ($s0)	               # load X, D, E character
    beq       $t0,  68, DecryptedCase   # check if program decrypted string
