@@ -13,12 +13,20 @@
 	
 	invalidInput:      .asciiz     "Invalid input: please input E, D, or X."
 	outputPrompt:      .asciiz     "Here is the encrypted and decrypted string\n"
+        askAgain:	   .asciiz     "\nDo you want to (E)ncrypt, (D)ecrypt, or e(X)it? "
 	Encrypted:         .asciiz     "<Encrypted> "
 	Decrypted:         .asciiz     "<Decrypted> "
 	newLine:           .asciiz     "\n"
 
 .text
 
+restart_prompt: nop
+	la	$a0, askAgain
+	li	$a1, 0
+	li $v0, 4                      # prints prompt loaded into $a0
+	syscall                        # execute command
+	j hover
+	
 give_prompt: nop
 #-------------------------------------------------------------------- 
 # arguments:  $a0 - address of string prompt to be printed to user 
@@ -33,7 +41,8 @@ give_prompt: nop
 
 	li $v0, 4                      # prints prompt loaded into $a0
 	syscall                        # execute command
-
+	
+hover: nop
    bne     $a1, 0, skipFirst
 	li $v0, 8                      # prepares for user input
 	la $a0, operationArray         # stores value into operation array
@@ -56,8 +65,12 @@ elseInput: nop
 	la 	$a0, invalidInput      # else, invalid input.
 	li 	$v0, 4                 # print invalid feedback
 	syscall 
+	
+	la      $a0, newLine           # prints a new line to conform with formatting
+	li      $v0, 4
+	syscall
 
-	j loop                         # hard reset to obtain new, valid input
+	j restart_prompt               # hard reset to obtain new, valid input
 validInput: nop
 	jr $ra                         # jump back to caller address
 
